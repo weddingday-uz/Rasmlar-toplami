@@ -1,395 +1,211 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap');
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nur Mebel | Sanjarber Usta</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- FontAwesome icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Plus Jakarta Sans', sans-serif;
-}
+    <!-- Header / Navbar -->
+    <header class="glass-header">
+        <div class="logo">
+            <i class="fa-solid fa-couch"></i> <span>NUR MEBEL</span>
+        </div>
+        <div class="contact-btn-wrapper">
+            <a href="tel:+998330325767" class="call-badge">
+                <i class="fa-solid fa-phone-volume"></i> +998 33 032 5767
+            </a>
+            <button class="admin-trigger-btn" onclick="openAdminModal()" title="Usta uchun">
+                <i class="fa-solid fa-lock"></i>
+            </button>
+        </div>
+    </header>
 
-body {
-    background-color: #0d1117;
-    color: #c9d1d9;
-    min-height: 100vh;
-}
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Sanjarber Usta</h1>
+            <p>Sifatli va murakkab dizayndagi mebellar olami. Har bir buyurtma o'ziga xos yondashuv asosida yasaladi.</p>
+            <div class="master-badge">
+                <i class="fa-solid fa-shield-halved"></i> Kafolatlangan Ishonch
+            </div>
+        </div>
+    </section>
 
-/* Glassmorphism Header */
-.glass-header {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 30px;
-    background: rgba(13, 17, 23, 0.85);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 1000;
-}
+    <!-- Gallery Section -->
+    <main class="container">
+        <h2 class="section-title">Bizning Ishlarimiz</h2>
+        <div class="gallery-grid" id="galleryGrid">
+            <!-- Dinamik rasmlar shu yerga tushadi -->
+        </div>
+    </main>
 
-.logo {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-size: 1.2rem;
-    font-weight: 700;
-    color: #58a6ff;
-    letter-spacing: 1px;
-}
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 Nur Mebel. Barcha huquqlar himoyalangan.</p>
+        <p>Usta: <strong>Sanjarber</strong> | <a href="tel:+998330325767">+998 33 032 5767</a></p>
+    </footer>
 
-.contact-btn-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-}
+    <!-- Admin Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content glass-card">
+            <span class="close" onclick="closeModals()">&times;</span>
+            <h3>Usta uchun kirish</h3>
+            <p>Maxfiy parolni kiriting:</p>
+            <input type="password" id="adminPassword" placeholder="Parol...">
+            <button onclick="checkAdminPassword()" class="action-btn">Kirish</button>
+        </div>
+    </div>
 
-.call-badge {
-    background: linear-gradient(135deg, #238636, #2ea043);
-    color: white;
-    padding: 8px 16px;
-    border-radius: 30px;
-    text-decoration: none;
-    font-weight: 600;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 15px rgba(35, 134, 54, 0.4);
-    transition: 0.3s ease;
-}
+    <!-- Admin Panel Modal (Rasm qo'shish) -->
+    <div id="adminModal" class="modal">
+        <div class="modal-content glass-card large-modal">
+            <span class="close" onclick="closeModals()">&times;</span>
+            <h3><i class="fa-solid fa-screwdriver-wrench"></i> Usta Boshqaruvi</h3>
+            <div class="upload-form">
+                <input type="text" id="imgUrl" placeholder="Rasm havolasi (URL linki)...">
+                <input type="text" id="imgTitle" placeholder="Mebel nomi (masalan: Zamonaviy shkaf)...">
+                <textarea id="imgDesc" placeholder="Qisqacha tavsif..."></textarea>
+                <button onclick="addNewImage()" class="action-btn success-btn">Rasm Qo'shish</button>
+            </div>
+            <hr>
+            <h4>Mavjud rasmlarni o'chirish:</h4>
+            <div id="adminImageList" class="admin-image-list">
+                <!-- O'chirish uchun ro'yxat -->
+            </div>
+        </div>
+    </div>
 
-.call-badge:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(46, 160, 67, 0.6);
-}
+    <!-- Image Preview Modal (Kattalashtirib ko'rish) -->
+    <div id="previewModal" class="modal img-preview-modal" onclick="closeModals()">
+        <span class="close">&times;</span>
+        <img id="previewImg" src="" alt="Zoomed">
+    </div>
 
-.admin-trigger-btn {
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    color: #8b949e;
-    width: 38px;
-    height: 38px;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: 0.3s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
+    <!-- JavaScript -->
+    <script>
+        // Boshlang'ich rasmlar bazasi (Siz yuklagan rasmlar va standart ma'lumotlar)
+        let galleryData = JSON.parse(localStorage.getItem('nurMebelImages')) || [
+            {
+                url: "image_6276c6.jpg",
+                title: "Katta Oynaali Shkaf",
+                desc: "Sifatli material va oyna dizayndagi shiftgacha bo'lgan shkaf."
+            },
+            {
+                url: "image_62796b.jpg",
+                title: "Ichki Tuzilishi (Polkalar)",
+                desc: "Kiyimlar va aksessuarlar uchun qulay bo'linmalar."
+            },
+            {
+                url: "image_62796f.jpg",
+                title: "Yuqori Antresol qismlari",
+                desc: "Joyni tejash uchun yuqori ochiladigan eshikchalar."
+            },
+            {
+                url: "image_627973.jpg",
+                title: "To'liq Ko'rinish",
+                desc: "Xonaga mukammal mos tushgan mebel dizayni."
+            }
+        ];
 
-.admin-trigger-btn:hover {
-    background: #58a6ff;
-    color: #fff;
-    border-color: #58a6ff;
-}
+        const PASS = "sanjar2026"; // Usta paroli
 
-/* Hero Section */
-.hero {
-    padding: 140px 20px 40px;
-    text-align: center;
-    background: radial-gradient(circle at center, rgba(88, 166, 255, 0.08) 0%, transparent 70%);
-}
+        function renderGallery() {
+            const grid = document.getElementById('galleryGrid');
+            grid.innerHTML = "";
+            galleryData.forEach((item, index) => {
+                grid.innerHTML += `
+                    <div class="gallery-card" style="animation-delay: ${index * 0.1}s">
+                        <div class="img-box" onclick="openPreview('${item.url}')">
+                            <img src="${item.url}" alt="${item.title}" onerror="this.src='https://images.unsplash.com/photo-1555041469-a586c61ea9bc?auto=format&fit=crop&w=600&q=80'">
+                            <div class="img-overlay">
+                                <i class="fa-solid fa-magnifying-glass-plus"></i>
+                            </div>
+                        </div>
+                        <div class="card-info">
+                            <h3>${item.title}</h3>
+                            <p>${item.desc}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            localStorage.setItem('nurMebelImages', JSON.stringify(galleryData));
+        }
 
-.hero-content h1 {
-    font-size: 2.5rem;
-    color: #ffffff;
-    margin-bottom: 10px;
-    animation: fadeInDown 0.8s ease;
-}
+        function openAdminModal() {
+            document.getElementById('loginModal').style.display = 'flex';
+        }
 
-.hero-content p {
-    color: #8b949e;
-    max-width: 600px;
-    margin: 0 auto 20px;
-    font-size: 1rem;
-    animation: fadeInUp 0.8s ease;
-}
+        function checkAdminPassword() {
+            const pass = document.getElementById('adminPassword').value;
+            if(pass === PASS) {
+                document.getElementById('loginModal').style.display = 'none';
+                document.getElementById('adminPassword').value = '';
+                document.getElementById('adminModal').style.display = 'flex';
+                renderAdminList();
+            } else {
+                alert("Parol noto'g'ri!");
+            }
+        }
 
-.master-badge {
-    display: inline-block;
-    background: rgba(88, 166, 255, 0.1);
-    border: 1px solid rgba(88, 166, 255, 0.3);
-    color: #58a6ff;
-    padding: 6px 14px;
-    border-radius: 20px;
-    font-size: 0.85srem;
-    font-weight: 600;
-}
+        function closeModals() {
+            document.getElementById('loginModal').style.display = 'none';
+            document.getElementById('adminModal').style.display = 'none';
+            document.getElementById('previewModal').style.display = 'none';
+        }
 
-/* Gallery Container */
-.container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 20px;
-}
+        function openPreview(url) {
+            document.getElementById('previewImg').src = url;
+            document.getElementById('previewModal').style.display = 'flex';
+        }
 
-.section-title {
-    text-align: center;
-    font-size: 1.8rem;
-    margin-bottom: 30px;
-    color: #e6edf3;
-    position: relative;
-}
+        function addNewImage() {
+            const url = document.getElementById('imgUrl').value.trim();
+            const title = document.getElementById('imgTitle').value.trim();
+            const desc = document.getElementById('imgDesc').value.trim();
 
-.section-title::after {
-    content: '';
-    display: block;
-    width: 60px;
-    height: 3px;
-    background: #58a6ff;
-    margin: 8px auto 0;
-    border-radius: 2px;
-}
+            if(!url || !title) {
+                alert("Iltimos, rasm havolasi va nomini kiriting!");
+                return;
+            }
 
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 25px;
-}
+            galleryData.unshift({ url, title, desc });
+            renderGallery();
+            renderAdminList();
+            
+            document.getElementById('imgUrl').value = '';
+            document.getElementById('imgTitle').value = '';
+            document.getElementById('imgDesc').value = '';
+            alert("Rasm muvaffaqiyatli qo'shildi!");
+        }
 
-/* Gallery Cards with Complex Animations */
-.gallery-card {
-    background: rgba(22, 27, 34, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
-    animation: scaleUp 0.6s ease backwards;
-    box-shadow: 0 8px 24px rgba(0,0,0,0.3);
-}
+        function renderAdminList() {
+            const list = document.getElementById('adminImageList');
+            list.innerHTML = "";
+            galleryData.forEach((item, index) => {
+                list.innerHTML += `
+                    <div class="admin-item">
+                        <span>${item.title}</span>
+                        <button onclick="deleteImage(${index})" class="del-btn"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                `;
+            });
+        }
 
-.gallery-card:hover {
-    transform: translateY(-8px) scale(1.02);
-    border-color: rgba(88, 166, 255, 0.4);
-    box-shadow: 0 16px 32px rgba(88, 166, 255, 0.15);
-}
+        function deleteImage(index) {
+            if(confirm("Haqiqatan ham bu rasmni o'chirmoqchimisiz?")) {
+                galleryData.splice(index, 1);
+                renderGallery();
+                renderAdminList();
+            }
+        }
 
-.img-box {
-    position: relative;
-    height: 220px;
-    overflow: hidden;
-    cursor: pointer;
-}
-
-.img-box img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
-}
-
-.gallery-card:hover .img-box img {
-    transform: scale(1.1);
-}
-
-.img-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.4);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    color: #fff;
-    font-size: 1.5rem;
-}
-
-.img-box:hover .img-overlay {
-    opacity: 1;
-}
-
-.card-info {
-    padding: 18px;
-}
-
-.card-info h3 {
-    font-size: 1.1rem;
-    color: #ffffff;
-    margin-bottom: 6px;
-}
-
-.card-info p {
-    font-size: 0.85rem;
-    color: #8b949e;
-    line-height: 1.4;
-}
-
-/* Footer */
-footer {
-    text-align: center;
-    padding: 40px 20px;
-    margin-top: 60px;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    color: #8b949e;
-    font-size: 0.9rem;
-}
-
-footer a {
-    color: #58a6ff;
-    text-decoration: none;
-}
-
-/* Modals */
-.modal {
-    display: none;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    backdrop-filter: blur(8px);
-    z-index: 2000;
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-.modal-content {
-    background: #161b22;
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    padding: 30px;
-    border-radius: 20px;
-    width: 100%;
-    max-width: 400px;
-    position: relative;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    animation: modalPop 0.3s ease;
-}
-
-.large-modal {
-    max-width: 550px;
-    max-height: 85vh;
-    overflow-y: auto;
-}
-
-.close {
-    position: absolute;
-    top: 15px;
-    right: 20px;
-    font-size: 1.5rem;
-    color: #8b949e;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.close:hover {
-    color: #fff;
-}
-
-.modal-content h3 {
-    margin-bottom: 15px;
-    color: #fff;
-}
-
-.modal-content input, .modal-content textarea {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 12px;
-    background: #0d1117;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #fff;
-    font-size: 0.95rem;
-}
-
-.modal-content textarea {
-    resize: vertical;
-    height: 80px;
-}
-
-.action-btn {
-    width: 100%;
-    padding: 12px;
-    background: #58a6ff;
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.action-btn:hover {
-    background: #388bfd;
-}
-
-.success-btn {
-    background: #238636;
-}
-.success-btn:hover {
-    background: #2ea043;
-}
-
-.admin-image-list {
-    margin-top: 15px;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.admin-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #0d1117;
-    padding: 10px;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-}
-
-.del-btn {
-    background: #da3633;
-    color: #fff;
-    border: none;
-    padding: 6px 10px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-.del-btn:hover {
-    background: #f85149;
-}
-
-/* Image Preview Fullscreen Modal */
-.img-preview-modal {
-    flex-direction: column;
-}
-
-.img-preview-modal img {
-    max-width: 90%;
-    max-height: 85vh;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
-    animation: scaleUp 0.3s ease;
-}
-
-.img-preview-modal .close {
-    top: 25px;
-    right: 35px;
-    font-size: 2.5rem;
-    color: #fff;
-}
-
-/* Keyframes Animations */
-@keyframes fadeInDown {
-    from { opacity: 0; transform: yu(-20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes scaleUp {
-    from { opacity: 0; transform: scale(0.95); }
-    to { opacity: 1; transform: scale(1); }
-}
-
-@keyframes modalPop {
-    from { opacity: 0; transform: scale(0.8); }
-    to { opacity: 1; transform: scale(1); }
-}
+        // Ishga tushganda galereyani yuklash
+        window.onload = renderGallery;
+    </script>
+</body>
+</html>
